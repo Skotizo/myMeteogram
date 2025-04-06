@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>USA Weather WebApp</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Courier New', Courier, monospace;
+      background-color: #f8f8f8;
+    }
+    header {
+      background: linear-gradient(135deg, rgb(5, 145, 101), rgb(5, 145, 101));
+      padding: 1rem;
+      text-align: center;
+      color: #fff;
+    }
+    header h1 {
+      font-size: 1.8rem;
+      margin: 0;
+      letter-spacing: 1px;
+    }
+    .container {
+      max-width: 1700px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .intro {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .intro p {
+      font-size: 1rem;
+      color: #333;
+    }
+    .btn-container {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    #getMeteogramBtn {
+      background: rgb(3, 99, 68);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    #getMeteogramBtn:hover {
+      background: rgb(5, 145, 101);
+    }
+    .forecast-content {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+    .meteogram-section, 
+    .text-section {
+      background-color: #ffffff;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      flex: 1 1 450px; 
+      padding: 1rem;
+      min-height: 200px;
+    }
+    .meteogram-section img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      margin: 0 auto;
+    }
+    #weather h2 {
+      margin-top: 0;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+    .forecast-period {
+      margin-bottom: 1rem;
+      border-bottom: 1px solid rgb(32, 32, 32);
+      padding-bottom: 1rem;
+    }
+    .forecast-period:last-child {
+      border-bottom: none;
+    }
+    .forecast-period img {
+      vertical-align: middle;
+      width: 100px;
+      height: 100px;
+      margin-right: 1rem;
+    }
+    @media (max-width: 768px) {
+      .forecast-content {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>USA Weather WebApp</h1>
+  </header>
+
+  <div class="ad-container">
+    <script async
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9423662851738586"
+            crossorigin="anonymous">
+    </script>
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-9423662851738586"
+         data-ad-slot="2225530080"
+         data-ad-format="auto"
+         data-full-width-responsive="true">
+    </ins>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    
+  </div>
+
+  <div class="container">
+    <div class="intro">
+      <p>
+        Click the button below to retrieve a meteogram and forecast
+        for your location. Please allow location access when prompted.
+      </p>
+    </div>
+
+    <div class="btn-container">
+      <button id="getMeteogramBtn" onclick="getLocation()">Show My Meteogram</button>
+    </div>
+
+    <div class="forecast-content">
+      <div class="meteogram-section">
+        <img 
+          id="meteogram" 
+          alt="Meteogram will appear here once generated."
+        />
+      </div>
+
+      <div class="text-section">
+        <div id="weather"></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    let csrfToken = "{{ csrf_token }}";
+
+    async function getGeoLocation() {
+        try {
+            const response = await fetch('/get_location', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+            console.log(data); // Logs the JSON response to the console
+
+            if (data.latitude && data.longitude) {
+                document.getElementById('weather').innerHTML = `
+                  <h2>Your Location</h2>
+                  <p>IP Address: ${data.ip}</p>
+                  <p>Latitude: ${data.latitude}</p>
+                  <p>Longitude: ${data.longitude}</p>
+                `;
+
+                // Load meteogram using latitude and longitude
+                showMeteogram({
+                    coords: {
+                        latitude: data.latitude,
+                        longitude: data.longitude
+                    }
+                });
+            } else {
+                document.getElementById('weather').innerHTML = '<p>Unable to determine location.</p>';
+            }
+        } catch (error) {
+            document.getElementById('weather').innerHTML = '<p>Error retrieving location.</p>';
+            console.error(error);
+        }
+    }
+
+    function showMeteogram(position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      const url = `/meteogram?lat=${lat}&lon=${lon}`;
+
+      fetch(url)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          const base64 = data.imageBase64;
+          document.getElementById('meteogram').src = "data:image/png;base64," + base64;
+
+          const forecastDiv = document.getElementById('weather');
+          forecastDiv.innerHTML = "";
+
+          const header = document.createElement('h2');
+          header.textContent = `Weather Forecast for ${data.city}, ${data.state}`;
+          forecastDiv.appendChild(header);
+
+          data.periods.forEach(period => {
+            const periodDiv = document.createElement('div');
+            periodDiv.classList.add('forecast-period');
+            periodDiv.innerHTML = `
+              <img src="${period.icon}" alt="Forecast Icon" />
+              <strong>${period.name}</strong><br/>
+              ${formatDateTime(period.startTime)} to ${formatDateTime(period.endTime)}<br/>
+              Temperature: ${period.temperature} ${period.temperatureUnit}<br/>
+              ${period.shortForecast}<br/>
+              <em>${period.detailedForecast}</em>
+            `;
+            forecastDiv.appendChild(periodDiv);
+          });
+        })
+        .catch(error => {
+          alert("Error fetching meteogram: " + error);
+        });
+    }
+
+    function formatDateTime(isoStr) {
+      if (!isoStr) return "";
+      const date = new Date(isoStr);
+      return date.toLocaleString();
+    }
+
+    function showError(error) {
+      document.getElementById('weather').innerHTML = '<p>Error retrieving geolocation.</p>';
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          alert("User denied the request for Geolocation.");
+          break;
+        case error.POSITION_UNAVAILABLE:
+          alert("Location information is unavailable.");
+          break;
+        case error.TIMEOUT:
+          alert("The request to get user location timed out.");
+          break;
+        case error.UNKNOWN_ERROR:
+          alert("An unknown error occurred.");
+          break;
+      }
+    }
+
+    // Automatically fetch location and show meteogram on page load
+    getGeoLocation();
+  </script>
+</body>
+</html>

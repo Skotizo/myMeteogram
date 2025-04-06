@@ -1,0 +1,192 @@
+/* Reset & Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: "Courier New", Courier, monospace;
+    background-color: #f8f8f8;
+  }
+  
+  /* Header */
+  header {
+    background: linear-gradient(135deg, rgb(5, 145, 101), rgb(5, 145, 101));
+    padding: 1rem;
+    text-align: center;
+    color: #fff;
+  }
+  
+  header h1 {
+    font-size: 1.8rem;
+    margin: 0;
+    letter-spacing: 1px;
+  }
+  
+  /* Navigation */
+  nav {
+    text-align: center;
+    background-color: #fafafa;
+    padding: 0.5rem 0;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  nav a {
+    text-decoration: none;
+    color: #333;
+    margin: 0 1rem;
+    font-weight: bold;
+  }
+  
+  nav a:hover {
+    color: #059165; /* Slight hover effect */
+  }
+  
+  /* Container */
+  .container {
+    max-width: 1700px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+  
+  /* Intro */
+  .intro {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .intro p {
+    font-size: 1rem;
+    color: #333;
+  }
+  
+  /* Button Container */
+  .btn-container {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .test-btn-container {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .geo-btn-container {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  /* ZIP Input Container */
+  .zip-container {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .zip-container input {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 0.5rem;
+  }
+  
+  .zip-container button {
+    background: rgb(3, 99, 68);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .zip-container button:hover {
+    background: rgb(3, 79, 55);
+  }
+  
+  /* General Button */
+  #getMeteogramBtn {
+    background: rgb(3, 99, 68);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  #getMeteogramBtn:hover {
+    background: rgb(3, 79, 55);
+  }
+  
+  /* Forecast Layout */
+  .forecast-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .meteogram-section,
+  .text-section {
+    background-color: #ffffff;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    flex: 1 1 600px;
+    padding: 1rem;
+    min-height: 200px;
+  }
+  
+  .meteogram-section img {
+    display: block;
+    max-width: 100%;
+    margin: 0 auto;
+    max-height: 100%;
+  }
+  
+  #weather h2 {
+    margin-top: 0;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .forecast-period {
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgb(32, 32, 32);
+    padding-bottom: 1rem;
+  }
+  
+  .forecast-period:last-child {
+    border-bottom: none;
+  }
+  
+  .forecast-period img {
+    vertical-align: middle;
+    width: 100px;
+    height: 100px;
+    margin-right: 1rem;
+  }
+  
+  /* Responsive */
+  @media (max-width: 360px) {
+    .forecast-content {
+      flex-direction: column;
+    }
+  }
+  .testBtn {
+    background: rgb(3, 99, 68);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin: 0.2rem; /* Adds slight spacing between buttons */
+  }
+  
+  .testBtn:hover {
+    background: rgb(3, 79, 55);
+  }

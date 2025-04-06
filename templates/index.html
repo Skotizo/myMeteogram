@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>USA Weather WebApp</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="static/css/styles.css" />
+</head>
+<body>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9423662851738586"
+     crossorigin="anonymous"></script>
+
+  <header>
+    <h1>USA Weather WebApp</h1>
+  </header>
+
+  <nav>
+    <a href="/">Home</a>
+    <a href="about">About</a>
+    <a href="terms">Terms of Service</a>
+    <a href="privacy">Privacy Policy</a>
+  </nav>
+
+  <div class="container">
+    <div class="intro">
+      <p>
+        Explore detailed weather forecasts and meteograms effortlessly! Click the
+        <b>Show My Meteogram</b> button below to retrieve real-time data for your
+        location. Our WebApp utilizes an <b>undocumented NOAA endpoint</b> that was 
+        discovered through deep analysis of NOAA’s website structure. This allows 
+        for <b>faster data retrieval</b> compared to manually navigating the NOAA 
+        website. Unlike the traditional NOAA site, which requires multiple steps to 
+        access meteogram data, our app automates the process, offering a seamless 
+        and instant forecast experience.
+      </p>
+      <p>
+        When prompted, please allow location access to personalize your forecast. 
+        You can also test the WebApp without sharing location data using the alternative 
+        buttons provided. After clicking, please wait a moment for the meteogram to 
+        generate using data from NOAA. Learn more about this novel approach in the 
+        <a href="about">About</a> section or read the full details in this 
+        <a href="https://steele.lol/noaa-undocumented-meteogram-endpoint-fun-mymeteogram-com/" 
+        target="_blank">blog post</a> exploring the undocumented NOAA endpoint.
+      </p>
+    </div>
+  </div>
+
+  <div class="geo-btn-container">
+    <p>Geo location Meteograms:</p>
+    <button id="getMeteogramBtn" onclick="getLocation()">Show My Meteogram</button>
+  </div>
+
+  <div class="test-btn-container">
+    <p>Test location Meteograms:</p>
+    <button class="testBtn" onclick="showMeteogram({ coords: { latitude: 40.73061, longitude: -73.935242 } }); this.style.display='none';">NYC</button>
+    <button class="testBtn" onclick="showMeteogram({ coords: { latitude: 41.878113, longitude: -87.629799 } }); this.style.display='none';">Chicago</button>
+    <button class="testBtn" onclick="showMeteogram({ coords: { latitude: 29.760427, longitude: -95.369804 } }); this.style.display='none';">Houston</button>
+    <button class="testBtn" onclick="showMeteogram({ coords: { latitude: 25.761681, longitude: -80.191788 } }); this.style.display='none';">Miami</button>
+    <button class="testBtn" onclick="showMeteogram({ coords: { latitude: 47.606209, longitude: -122.332069 } }); this.style.display='none';">Seattle</button>
+    <button class="testBtn" onclick="showMeteogram({ coords: { latitude: 33.749099, longitude: -84.390185 } }); this.style.display='none';">Atlanta</button>
+  </div>
+
+  <div class="zip-container">
+    <p>Zip code location Meteograms:</p>
+    <input type="text" id="zipInput" placeholder="Enter ZIP code" />
+    <button onclick="goToZipMeteogram()">Show Meteogram by ZIP</button>
+  </div>
+
+  <div class="forecast-content">
+    <div class="meteogram-section">
+      <img id="meteogram" alt="Meteogram will appear here once generated." />
+    </div>
+    <div class="text-section">
+      <div id="weather">
+        <div id="weatherText">
+          <p>Weather forecast will appear here once generated.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let csrfToken = "{{ csrf_token }}";
+
+    function goToZipMeteogram() {
+      const zip = document.getElementById("zipInput").value.trim();
+      if (!zip) {
+        alert("Please enter a valid ZIP code.");
+        return;
+      }
+      fetch(`/zipToGeo?zip=${encodeURIComponent(zip)}&csrf_token=${csrfToken}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (!data.lat || !data.lon) {
+            throw new Error("Server response missing lat/lon.");
+          }
+          const position = {
+            coords: {
+              latitude: parseFloat(data.lat),
+              longitude: parseFloat(data.lon),
+            },
+          };
+          showMeteogram(position);
+        })
+        .catch(err => {
+          alert("Bad Zip. Error fetching from ZIP code. " + err);
+        });
+    }
+
+    function getLocation() {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(showMeteogram, showError, {
+          enableHighAccuracy: false,
+          timeout: 10000,
+          maximumAge: 30000,
+        });
+      } else {
+        alert("Geolocation is not supported by this browser. Try another.");
+      }
+    }
+
+    function showMeteogram(position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      const url = `/meteogram?lat=${lat}&lon=${lon}&csrf_token=${csrfToken}`;
+
+      fetch(url)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          const base64 = data.imageBase64;
+          document.getElementById("meteogram").src = "data:image/png;base64," + base64;
+
+          const weatherTextEl = document.getElementById("weatherText");
+          if (weatherTextEl) {
+            weatherTextEl.style.display = "none";
+          }
+
+          const forecastDiv = document.getElementById("weather");
+          forecastDiv.innerHTML = "";
+
+          const header = document.createElement("h2");
+          header.textContent = `Weather Forecast for ${data.city}, ${data.state}`;
+          forecastDiv.appendChild(header);
+
+          data.periods.forEach(period => {
+            const periodDiv = document.createElement("div");
+            periodDiv.classList.add("forecast-period");
+            periodDiv.innerHTML = `
+              <img src="${period.icon}" alt="Forecast Icon" />
+              <strong>${period.name}</strong><br/>
+              ${formatDateTime(period.startTime)} to ${formatDateTime(period.endTime)}<br/>
+              Temperature: ${period.temperature} ${period.temperatureUnit}<br/>
+              ${period.shortForecast}<br/>
+              <em>${period.detailedForecast}</em>
+            `;
+            forecastDiv.appendChild(periodDiv);
+          });
+        })
+        .catch(error => {
+          alert("Error fetching meteogram: " + error);
+          document.getElementById("getMeteogramBtn").style.display = "inline-block";
+        });
+    }
+
+    function formatDateTime(isoStr) {
+      if (!isoStr) return "";
+      const date = new Date(isoStr);
+      return date.toLocaleString();
+    }
+
+    function showError(error) {
+      document.getElementById("getMeteogramBtn").style.display = "inline-block";
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          alert("User denied the request for Geolocation.");
+          break;
+        case error.POSITION_UNAVAILABLE:
+          alert("Location information is unavailable.");
+          break;
+        case error.TIMEOUT:
+          alert("The request to get user location timed out.");
+          break;
+        default:
+          alert("An unknown error occurred.");
+          break;
+      }
+    }
+  </script>
+
+  <div class="ad-container">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9423662851738586" crossorigin="anonymous"></script>
+  </div>
+</body>
+</html>

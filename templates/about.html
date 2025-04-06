@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>About - USA Weather WebApp</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Link to the external CSS (same as the home page) -->
+  <link rel="stylesheet" href="static/css/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>About - USA Weather WebApp</h1>
+  </header>
+
+  <nav>
+    <a href="/">Home</a>
+    <a href="about">About</a>
+    <a href="terms">Terms of Service</a>
+    <a href="privacy">Privacy Policy</a>
+  </nav>
+
+  <div class="container">
+    <section>
+      <h2>Why This WebApp is More Efficient Than NOAA</h2>
+      <p>The USA Weather WebApp provides a streamlined way to access NOAA meteogram data without requiring users to navigate multiple pages or manually find the right weather station. Unlike the NOAA site, which can be slow and cumbersome, our application automates the process by directly querying the NOAA meteogram data using an optimized API request. This means:</p>
+      <ul>
+        <li>Faster load times with direct data retrieval.</li>
+        <li>Automatically detects the nearest weather station based on location.</li>
+        <li>Provides a clean and readable meteogram without extra steps.</li>
+      </ul>
+      <p>This approach is based on findings detailed in an article from <a href="https://steele.lol/noaa-undocumented-meteogram-endpoint-fun-mymeteogram-com/" target="_blank">Steele.lol</a>, which explores an undocumented endpoint within NOAA's site for retrieving meteogram content.</p>
+    </section>
+
+    <section>
+      <h2>Novel Approach Using an Undocumented NOAA Endpoint</h2>
+      <p>This application is unique in that it leverages an undocumented NOAA endpoint discovered through analyzing NOAA’s website structure. By utilizing this hidden API, we can efficiently fetch meteogram data in a way that is not publicly documented, reducing the need for users to perform manual searches. This novel method enables a seamless and highly efficient weather tracking experience.</p>
+    </section>
+
+    <section>
+      <h2>How to Read a Meteogram</h2>
+      <p>A meteogram is a visual representation of weather conditions over time for a specific location. Here’s how to interpret the key sections based on the provided image:</p>
+      <ul>
+        <li><strong>Temperature and Dew Point:</strong> The red and green lines in the top chart show temperature and dew point trends over time.</li>
+        <li><strong>Wind Speed and Direction:</strong> The arrows indicate wind direction, while the barbs show wind speed.</li>
+        <li><strong>Cloud Cover and Precipitation:</strong> Different shaded regions represent cloud coverage and chances of precipitation.</li>
+        <li><strong>Pressure Trends:</strong> A downward trend suggests stormy weather, while a rising trend indicates improving conditions.</li>
+        <li><strong>Humidity and Other Variables:</strong> Additional graphs provide insights into relative humidity, visibility, and other meteorological factors.</li>
+      </ul>
+      <p>By using this meteogram, users can quickly gauge upcoming weather conditions without having to interpret multiple separate reports.</p>
+    </section>
+  </div>
+</body>
+</html>
